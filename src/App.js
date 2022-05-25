@@ -1,87 +1,170 @@
-import React from 'react';
-import { Collapse, Button, Col, Row,Slider, notification } from 'antd';
-import './App.css';
-import axios from 'axios';
+import React, { useState } from "react";
+import { Collapse, Button, Col, Row, Slider } from "antd";
+import "./App.css";
+import axios from "axios";
 import { useReactMediaRecorder } from "react-media-recorder";
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
 
-const URL_A3_SERVICE = 'http://192.168.1.6:8080'
+const URL_A3_SERVICE = "http://192.168.1.4:8080";
 const App = () => {
-  const {
-    status,
-    startRecording,
-    stopRecording,
-    mediaBlobUrl,
-  } = useReactMediaRecorder({ video: true });
+  const [speed, setSpeed] = useState(50);
+  const { status, startRecording, stopRecording, mediaBlobUrl } =
+    useReactMediaRecorder({ video: true });
+  const { transcript, resetTranscript } = useSpeechRecognition();
 
   const sendHandControl = (direction) => {
-    console.info(direction)
-    axios.post(`${URL_A3_SERVICE}/hand`, {
-      "direction": 'direction',
-      "speed": 'speed'
-    }).then((data) => {
-      console.open({
-        message: direction,
-        description: status
+    console.info(direction);
+    console.info(speed);
+    sendSpeedControl(speed);
+    axios
+      .post(`${URL_A3_SERVICE}/hand`, {
+        direction: direction,
       })
-    }).catch((error) => {
-      console.info(error)
-    })
-  }
+      .then((data) => {
+        console.info(data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   const sendSpeedControl = (speed) => {
-    console.info(speed)
-    axios.post(`${URL_A3_SERVICE}/speed`, {
-      "direction": 'direction',
-      "speed": 'speed'
-    }).then((data) => {
-      console.open({
-        message: 'direction',
-        description: status
+    console.info(speed);
+    axios
+      .post(`${URL_A3_SERVICE}/speed`, {
+        speed: speed,
       })
-    }).catch((error) => {
-      console.info(error)
-    })
-  }
-
+      .then((data) => {
+        console.info(data);
+      })
+      .catch((error) => {
+        console.info(error);
+      });
+  };
 
   return (
-    <Collapse defaultActiveKey={['1']}>
-      <Collapse.Panel header="Hand control" key="1">
-        <Button onMouseDown={() => sendHandControl(1)} 
-                type="primary"
-                onMouseUp={() => sendHandControl(5)} > 
-        LEFT
-        </Button>
-        <Button onClick={() => sendHandControl(2, 1)} type="primary">RIGHT</Button>
-        <Button onClick={() => sendHandControl(3, 1)} type="primary">FORWARD</Button>
-        <Button onClick={() => sendHandControl(4, 1)} type="primary">BACKWARD</Button>
-      </Collapse.Panel>
+    <>
+      <iframe title="Video Streaming" width={500} height={300} src="http://192.168.1.4:5000/" />
+      <Collapse defaultActiveKey={["1"]}>
+        <Collapse.Panel header="Hand control" key="1">
+          <Slider
+            min={0}
+            max={100}
+            step={5}
+            onAfterChange={(speed) => setSpeed(speed)}
+          />
 
+          <Button
+            onMouseDown={() => sendHandControl(1)}
+            onMouseUp={() => sendHandControl(5)}
+            type="primary"
+          >
+            FORWARD
+          </Button>
+          <Button
+            onMouseDown={() => sendHandControl(2)}
+            onMouseUp={() => sendHandControl(5)}
+            type="primary"
+          >
+            BACKWARD
+          </Button>
+          <Button
+            onMouseDown={() => sendHandControl(3)}
+            onMouseUp={() => sendHandControl(5)}
+            type="primary"
+          >
+            LEFT
+          </Button>
+          <Button
+            onMouseDown={() => sendHandControl(4)}
+            onMouseUp={() => sendHandControl(5)}
+            type="primary"
+          >
+            RIGHT
+          </Button>
+          <Button onClick={() => sendHandControl(5)} type="primary">
+            STOP
+          </Button>
+        </Collapse.Panel>
 
-
-
-
-
-      <Collapse.Panel header="Voice control" key="2">
-        <Row>
-          <Col span={8}>
-            {
-              // eslint-disable-next-line eqeqeq
-              status == "recording"
-                ? <Button style={{ marginTop: "15px" }} type="primary" onClick={stopRecording}>Stop</Button>
-                : <Button style={{ marginTop: "15px" }} type="primary" onClick={startRecording}>Record</Button>
-            }
-          </Col>
-          <Col span={16}>
-            <audio src={mediaBlobUrl} controls autoPlay loop />
-          </Col>
-        </Row>
-      </Collapse.Panel>
-    </Collapse>
-  )
-}
-
-
+        <Collapse.Panel header="Voice control" key="2">
+          <Row>
+            <Col span={8}>
+              {
+                // eslint-disable-next-line
+                status == "recording" ? (
+                  <Button
+                    style={{ marginTop: "15px" }}
+                    type="primary"
+                    onClick={() => {
+                      stopRecording();
+                      SpeechRecognition.stopListening();
+                      let signal = transcript?.toLowerCase();
+                      console.info(signal);
+                      if (
+                        signal === "đi tới" ||
+                        signal === "tiến" ||
+                        signal === "đi thẳng" ||
+                        signal === "up" ||
+                        signal === "move forward"
+                      ) {
+                        sendHandControl(1);
+                        setTimeout(() => sendHandControl(5), 3000);
+                      } else if (
+                        signal === "đi lùi" ||
+                        signal === "lùi" ||
+                        signal === "down" ||
+                        signal === "reverse" ||
+                        signal === "move backward"
+                      ) {
+                        sendHandControl(2);
+                        setTimeout(() => sendHandControl(5), 3000);
+                      } else if (
+                        signal === "quẹo trái" ||
+                        signal === "trái" ||
+                        signal === "turn left"
+                      ) {
+                        sendHandControl(3);
+                        setTimeout(() => sendHandControl(5), 1500);
+                      } else if (
+                        signal === "quẹo phải" ||
+                        signal === "phải" ||
+                        signal === "turn right"
+                      ) {
+                        sendHandControl(1);
+                        setTimeout(() => sendHandControl(5), 1500);
+                      } else {
+                        console.info("Invalid words");
+                      }
+                    }}
+                  >
+                    Stop
+                  </Button>
+                ) : (
+                  <Button
+                    style={{ marginTop: "15px" }}
+                    type="primary"
+                    onClick={() => {
+                      resetTranscript();
+                      SpeechRecognition.startListening({ continuous: true });
+                      startRecording();
+                    }}
+                  >
+                    Record
+                  </Button>
+                )
+              }
+            </Col>
+            <Col span={16}>
+              <audio src={mediaBlobUrl} controls autoPlay />
+            </Col>
+          </Row>
+        </Collapse.Panel>
+      </Collapse>
+    </>
+  );
+};
 
 export default App;
