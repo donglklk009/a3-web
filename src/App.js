@@ -7,7 +7,7 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 
-const URL_A3_SERVICE = "http://192.168.1.4:8080";
+const URL_A3_SERVICE = "http://192.168.1.6:8080";
 const App = () => {
   const [speed, setSpeed] = useState(50);
   const { status, startRecording, stopRecording, mediaBlobUrl } =
@@ -46,7 +46,21 @@ const App = () => {
 
   return (
     <>
-      <iframe title="Video Streaming" width={500} height={300} src="http://192.168.1.4:5000/" />
+      <iframe
+        title="Video Streaming"
+        width={500}
+        height={300}
+        src="http://192.168.1.6:5000/"
+      />
+      <Button onClick={() => sendHandControl(6)} type="primary">
+        Cam left
+      </Button>
+      <Button onClick={() => sendHandControl(7)} type="primary">
+        Cam right
+      </Button>
+      <Button onClick={() => sendHandControl(8)} type="primary">
+        Cam straight
+      </Button>
       <Collapse defaultActiveKey={["1"]}>
         <Collapse.Panel header="Hand control" key="1">
           <Slider
@@ -111,7 +125,7 @@ const App = () => {
                         signal === "move forward"
                       ) {
                         sendHandControl(1);
-                        setTimeout(() => sendHandControl(5), 3000);
+                        setTimeout(() => sendHandControl(5), 2000);
                       } else if (
                         signal === "đi lùi" ||
                         signal === "lùi" ||
@@ -120,21 +134,21 @@ const App = () => {
                         signal === "move backward"
                       ) {
                         sendHandControl(2);
-                        setTimeout(() => sendHandControl(5), 3000);
+                        setTimeout(() => sendHandControl(5), 2000);
                       } else if (
                         signal === "quẹo trái" ||
                         signal === "trái" ||
                         signal === "turn left"
                       ) {
                         sendHandControl(3);
-                        setTimeout(() => sendHandControl(5), 1500);
+                        setTimeout(() => sendHandControl(5), 900);
                       } else if (
                         signal === "quẹo phải" ||
                         signal === "phải" ||
                         signal === "turn right"
                       ) {
-                        sendHandControl(1);
-                        setTimeout(() => sendHandControl(5), 1500);
+                        sendHandControl(4);
+                        setTimeout(() => sendHandControl(5), 900);
                       } else {
                         console.info("Invalid words");
                       }
