@@ -6,6 +6,11 @@ import { useReactMediaRecorder } from "react-media-recorder";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
+import {
+  CaretRightOutlined,
+  PauseOutlined,
+  VideoCameraOutlined,
+} from "@ant-design/icons";
 
 const URL_A3_SERVICE = "http://192.168.1.6:8080";
 const App = () => {
@@ -52,15 +57,24 @@ const App = () => {
         height={300}
         src="http://192.168.1.6:5000/"
       />
-      <Button onClick={() => sendHandControl(6)} type="primary">
-        Cam left
-      </Button>
-      <Button onClick={() => sendHandControl(7)} type="primary">
-        Cam right
-      </Button>
-      <Button onClick={() => sendHandControl(8)} type="primary">
-        Cam straight
-      </Button>
+      <div>
+        <Button onClick={() => sendHandControl(6)} type="primary">
+          Cam left
+          <VideoCameraOutlined />
+        </Button>
+        <Button onClick={() => sendHandControl(8)} type="primary"
+        style={{
+          margin: '0px 10px'
+        }}
+        >
+          Cam straight
+          <VideoCameraOutlined />
+        </Button>
+        <Button onClick={() => sendHandControl(7)} type="primary">
+          Cam right
+          <VideoCameraOutlined />
+        </Button>
+      </div>
       <Collapse defaultActiveKey={["1"]}>
         <Collapse.Panel header="Hand control" key="1">
           <Slider
@@ -69,38 +83,96 @@ const App = () => {
             step={5}
             onAfterChange={(speed) => setSpeed(speed)}
           />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Button
+              onMouseDown={() => sendHandControl(3)}
+              onMouseUp={() => sendHandControl(5)}
+              type="primary"
+              style={{
+                transform: "rotate(180deg)",
+                width: "40px",
+                height: "40px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <CaretRightOutlined />
+            </Button>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                margin: "0px 10px",
+              }}
+            >
+              <Button
+                onMouseDown={() => sendHandControl(1)}
+                onMouseUp={() => sendHandControl(5)}
+                type="primary"
+                style={{
+                  transform: "rotate(-90deg)",
+                  width: "40px",
+                  height: "40px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <CaretRightOutlined />
+              </Button>
+              <Button
+                onClick={() => sendHandControl(5)}
+                type="primary"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  margin: "10px 0px",
+                }}
+              >
+                <PauseOutlined />
+              </Button>
+              <Button
+                onMouseDown={() => sendHandControl(2)}
+                onMouseUp={() => sendHandControl(5)}
+                type="primary"
+                style={{
+                  transform: "rotate(90deg)",
+                  width: "40px",
+                  height: "40px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <CaretRightOutlined />
+              </Button>
+            </div>
 
-          <Button
-            onMouseDown={() => sendHandControl(1)}
-            onMouseUp={() => sendHandControl(5)}
-            type="primary"
-          >
-            FORWARD
-          </Button>
-          <Button
-            onMouseDown={() => sendHandControl(2)}
-            onMouseUp={() => sendHandControl(5)}
-            type="primary"
-          >
-            BACKWARD
-          </Button>
-          <Button
-            onMouseDown={() => sendHandControl(3)}
-            onMouseUp={() => sendHandControl(5)}
-            type="primary"
-          >
-            LEFT
-          </Button>
-          <Button
-            onMouseDown={() => sendHandControl(4)}
-            onMouseUp={() => sendHandControl(5)}
-            type="primary"
-          >
-            RIGHT
-          </Button>
-          <Button onClick={() => sendHandControl(5)} type="primary">
-            STOP
-          </Button>
+            <Button
+              onMouseDown={() => sendHandControl(4)}
+              onMouseUp={() => sendHandControl(5)}
+              type="primary"
+              style={{
+                width: "40px",
+                height: "40px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <CaretRightOutlined />
+            </Button>
+          </div>
         </Collapse.Panel>
 
         <Collapse.Panel header="Voice control" key="2">
